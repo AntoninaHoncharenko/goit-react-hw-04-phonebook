@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { GlobalStyle } from 'GlobalStyles';
 import { ContactForm } from './ContactForm/ContactForm';
@@ -9,32 +9,22 @@ import { Box } from './Box';
 import { Title, Subtitle } from './App.styled';
 
 export const App = () => {
-  const [contacts, setContacts] = useState([
+  const initialContacts = [
     { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
     { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
     { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
     { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ]);
+  ];
+
+  const [contacts, setContacts] = useState(() => {
+    return JSON.parse(localStorage.getItem('savedContacts')) ?? initialContacts;
+  });
 
   const [filter, setFilter] = useState('');
 
-  // componentDidMount() {
-  //   const savedContacts = localStorage.getItem('savedContacts');
-  //   if (savedContacts !== null) {
-  //     this.setState({
-  //       contacts: JSON.parse(savedContacts),
-  //     });
-  //   }
-  // }
-
-  // componentDidUpdate(_, prevState) {
-  //   if (prevState.contacts !== this.state.contacts) {
-  //     localStorage.setItem(
-  //       'savedContacts',
-  //       JSON.stringify(this.state.contacts)
-  //     );
-  //   }
-  // }
+  useEffect(() => {
+    localStorage.setItem('savedContacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   const addContact = (name, number) => {
     const contact = {
@@ -43,7 +33,7 @@ export const App = () => {
       number,
     };
 
-    setContacts([contact, ...contacts]);
+    setContacts(prevState => [contact, ...prevState]);
   };
 
   const deleteContact = contactId => {
